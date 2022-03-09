@@ -18,11 +18,13 @@ const okImxWeb = {
     const { address, starkPublicKey } = await link.setup({});
     localStorage.setItem('okt_nft_address', address);
     localStorage.setItem('okt_nft_startPublicKey', starkPublicKey);
+    return {address}
   },
   async getUserBalances() {
-    const address = localStorage.getItem('WALLET_ADDRESS');
+    const address = localStorage.getItem('okt_nft_address');
     const client = await ImmutableXClient.build({ publicApiUrl: apiAddress });
-    const balance = await client.getBalances({ user: address });
+    const obj = await client.getBalances({ user: address });
+    const balance = parseInt(obj.imx['_hex'],16);
     return balance;
   },
   async transferERC721(asset, addressToSendTo) {
@@ -50,17 +52,21 @@ const okImxWeb = {
     const result = await link.buy(orderIds);
     return result;
   },
-  async getOrders(collectionAddress) {
-    // const client = await ImmutableXClient.build(apiAddress);
-    window.open(
-      `https://api.x.immutable.com/v1/orders?sell_token_address=${collectionAddress}&status=active`
-    );
-    // console.log(client, 5555);
-    // const ordersRequest = await client.getOrders({
-    //   status: 'active',
-    //   sell_token_address: collectionAddress,
-    // });
-    // console.log(ordersRequest);
+  async getOrders() {
+    const client = await ImmutableXClient.build({ publicApiUrl: apiAddress });
+    if(localStorage.getItem('okt_nft_address')){
+       const {result} = await client.getOrders()||[];
+       return result;
+    }
+  },
+  async getOrder(orderId) {
+    console.log(orderId)
+    const client = await ImmutableXClient.build({ publicApiUrl: apiAddress });
+    if(localStorage.getItem('okt_nft_address')){
+       const {result} = await client.getOrder({orderId:orderId});
+       console.log(result,555)
+       return result;
+    }
   },
   async cancelOrder(order) {
     const link = new Link(linkAddress);

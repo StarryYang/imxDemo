@@ -5,7 +5,7 @@
  * @Date: 2022-02-22 16:51:49
  */
 import React, { useState } from "react";
-import { Button, Input, Row, Col } from "antd";
+import { Button, Input, Row, Col ,message} from "antd";
 import okImxWeb from "./okImxWeb";
 import "./App.less";
 
@@ -14,8 +14,12 @@ const App = () => {
   const tokenAddress = "0xacb3c6a43d15b907e8433077b6d38ae40936fe2c";
   const [order, setOrder] = useState("");
   const [price, setPrice] = useState("");
-  const linkWallet = () => {
-    okImxWeb.setupAccount();
+  const [addr,setAddr] = useState("");
+  const [list,setList] = useState([]);
+  const [balance,setBalance] = useState('');
+  const linkWallet = async() => {
+   const {address} = await okImxWeb.setupAccount();
+   setAddr(address)
   };
   const buy = (orderIds) => {
     console.log(orderIds, 1111);
@@ -39,9 +43,31 @@ const App = () => {
       "0x09D5e8711bbb6bC376435E6A8625848E0dd01343"
     );
   };
+ const getOrders = async() =>{
+   if(!localStorage.getItem('okt_nft_address')) return message.error('请链接钱包');
+   const orders = await okImxWeb.getOrders();
+   console.log(orders);
+   setList(orders);
+ }
+  const getBalance = async() =>{
+    const ban=  await okImxWeb.getUserBalances();
+    setBalance(ban)
+  }
+  const getOrder = async() =>{
+    const result = await okImxWeb.getOrder(order);
+    console.log(result)
+  }
   return (
     <div className="imx-container">
       <h1>Imx调研</h1>
+      {
+            addr&&
+            <p>钱包地址：{addr}</p>
+          }
+          {
+            balance&&
+            <p>账户余额:{balance}</p>
+          }
       <Row gutter={16}>
         <Col span={12} className="gutter-row">
           <Button
@@ -51,6 +77,7 @@ const App = () => {
           >
             链接钱包
           </Button>
+         
         </Col>
         <Col span={12} className="gutter-row">
           <Input
@@ -131,6 +158,22 @@ const App = () => {
             </Button>
         </Col>
       </Row>
+      <Row>
+        <Col span={12}>
+          <Button onClick={()=>{getBalance()}}>查询账户余额</Button>
+        </Col>
+        <Col span={12}>
+          <Button onClick={()=>{getOrders()}}>查询所有订单</Button>
+        </Col>
+      </Row>
+      {list&&(
+        list.map((item,index)=>{
+          return <div key={item.order_id}>
+            <p>订单号：{item.order_id}</p>
+            <p>user: {item.user}</p>
+           </div>
+        })
+      )}
     </div>
   );
 };
