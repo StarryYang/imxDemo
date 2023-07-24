@@ -16,7 +16,7 @@ const App = () => {
   const [price, setPrice] = useState("");
   const [addr,setAddr] = useState("");
   const [list,setList] = useState([]);
-  const [balance,setBalance] = useState('');
+  const [balance,setBalance] = useState([]);
   const [result,setResult] = useState([]);
   const linkWallet = async() => {
    const {address} = await okImxWeb.setupAccount();
@@ -38,10 +38,10 @@ const App = () => {
   const transformNft = () => {
     okImxWeb.transferERC721(
       {
-        id: "0x0f00d561071eac5d2ad0d7426e5c8965b8c81320b7643eac121542e413594ffd",
-        token_address: "0x2880c6ecf2f770bd31ddb0d776cc81048899b600",
+        id: "160003924",
+        token_address: "0xacb3c6a43d15b907e8433077b6d38ae40936fe2c",
       },
-      "0x09D5e8711bbb6bC376435E6A8625848E0dd01343"
+      "0x81Fc6F6E44a2313743bCAA060681d24597aDbDfB"
     );
   };
  const getOrders = async() =>{
@@ -51,7 +51,8 @@ const App = () => {
    setList(orders);
  }
   const getBalance = async() =>{
-    const ban=  await okImxWeb.getUserBalances();
+    const ban=  await okImxWeb.getUserBalances("GODS");
+    console.log(ban,555);
     setBalance(ban)
   }
   const getAssetsData =  async() =>{
@@ -167,7 +168,7 @@ const App = () => {
           <Button onClick={()=>{getOrders()}}>查询所有订单</Button>
         </Col>
       </Row>
-      <Button onClick={()=>{okImxWeb.despoit('0.0001','USDC')}}>充值代币</Button>
+      <Button onClick={()=>{okImxWeb.despoit('10','OMI')}}>充值代币</Button>
       <Button onClick={()=>{getAssetsData()}}>获取assets</Button>
 
       {list&&(
